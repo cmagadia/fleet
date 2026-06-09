@@ -462,6 +462,8 @@ type ModifyGlobalPolicyFunc func(ctx context.Context, id uint, p fleet.ModifyPol
 
 type GetPolicyByIDFunc func(ctx context.Context, policyID uint) (*fleet.Policy, error)
 
+type ListPolicyAutomationActivitiesFunc func(ctx context.Context, policyID uint, opts fleet.ListOptions, status string) ([]*fleet.PolicyAutomationActivity, *fleet.PaginationMetadata, error)
+
 type ApplyPolicySpecsFunc func(ctx context.Context, policies []*fleet.PolicySpec) error
 
 type CountGlobalPoliciesFunc func(ctx context.Context, matchQuery string) (int, error)
@@ -1603,6 +1605,9 @@ type Service struct {
 
 	GetPolicyByIDFunc        GetPolicyByIDFunc
 	GetPolicyByIDFuncInvoked bool
+
+	ListPolicyAutomationActivitiesFunc        ListPolicyAutomationActivitiesFunc
+	ListPolicyAutomationActivitiesFuncInvoked bool
 
 	ApplyPolicySpecsFunc        ApplyPolicySpecsFunc
 	ApplyPolicySpecsFuncInvoked bool
@@ -3869,6 +3874,13 @@ func (s *Service) GetPolicyByID(ctx context.Context, policyID uint) (*fleet.Poli
 	s.GetPolicyByIDFuncInvoked = true
 	s.mu.Unlock()
 	return s.GetPolicyByIDFunc(ctx, policyID)
+}
+
+func (s *Service) ListPolicyAutomationActivities(ctx context.Context, policyID uint, opts fleet.ListOptions, status string) ([]*fleet.PolicyAutomationActivity, *fleet.PaginationMetadata, error) {
+	s.mu.Lock()
+	s.ListPolicyAutomationActivitiesFuncInvoked = true
+	s.mu.Unlock()
+	return s.ListPolicyAutomationActivitiesFunc(ctx, policyID, opts, status)
 }
 
 func (s *Service) ApplyPolicySpecs(ctx context.Context, policies []*fleet.PolicySpec) error {
