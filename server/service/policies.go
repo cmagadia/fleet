@@ -97,7 +97,9 @@ func (svc Service) ListPolicyAutomationActivities(ctx context.Context, policyID 
 		return nil, nil, fleet.NewInvalidArgumentError("per_page", fmt.Sprintf("must be no greater than %d", maxPolicyAutomationActivitiesPerPage))
 	}
 	if opts.OrderKey == "" {
+		// Default to newest activity first.
 		opts.OrderKey = "created_at"
+		opts.OrderDirection = fleet.OrderDescending
 	}
 	opts.IncludeMetadata = true
 
